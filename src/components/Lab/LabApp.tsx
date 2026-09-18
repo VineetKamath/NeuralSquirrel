@@ -37,6 +37,7 @@ import { SettingsModal, setSpeedEverywhere } from "./Settings";
 import { CommandPalette } from "./CommandPalette";
 import { getAudio } from "@/audio/AudioEngine";
 import { pad } from "@/utils/format";
+import { useSmallScreen } from "@/utils/device";
 
 // runs once when the (client-only) lab module loads, before any component renders
 let initialised = false;
@@ -188,6 +189,40 @@ function MapOverlay() {
 }
 
 /** a layout cell; double-click a panel header to expand it over the lab, Esc or double-click to restore */
+/** bottom tab bar on phones (the desktop mode tabs live in the top bar) */
+function MobileNav() {
+  const mode = useLab((s) => s.mode);
+  const cinematic = useLab((s) => s.cinematic);
+  const booted = useLab((s) => s.booted);
+  if (!booted || cinematic) return null;
+  const tabs: { id: "observe" | "neural" | "ecology"; label: string; icon: string }[] = [
+    { id: "observe", label: "OBSERVE", icon: "◉" },
+    { id: "neural", label: "BRAIN", icon: "✺" },
+    { id: "ecology", label: "MAP", icon: "▦" },
+  ];
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-[var(--color-line-strong)] bg-[#070909]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      {tabs.map((t) => (
+        <button
+          key={t.id}
+          className={`mono flex flex-col items-center gap-0.5 py-2 text-[9px] tracking-[0.16em] ${mode === t.id ? "text-[var(--color-signal)]" : "text-[var(--color-dim)]"}`}
+          onClick={() => {
+            useLab.getState().setMode(t.id);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          <span className="text-[15px] leading-none">{t.icon}</span>
+          {t.label}
+        </button>
+      ))}
+      <button className="mono flex flex-col items-center gap-0.5 py-2 text-[9px] tracking-[0.16em] text-[var(--color-dim)]" onClick={() => useLab.getState().toggle("cinematic")}>
+        <span className="text-[15px] leading-none">▶</span>
+        CINEMA
+      </button>
+    </nav>
+  );
+}
+
 function Slot({ area, className = "", children }: { area: string; className?: string; children: React.ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   useEffect(() => {
@@ -267,6 +302,7 @@ export default function LabApp() {
   );
 
   const view = cinematic ? "cinematic" : mode;
+  const small = useSmallScreen();
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-void)] xl:h-screen xl:overflow-hidden">
@@ -278,14 +314,14 @@ export default function LabApp() {
         )}
       </AnimatePresence>
 
-      <main className={`min-h-0 flex-1 ${cinematic ? "p-0" : "p-[6px]"}`}>
+      <main className={`min-h-0 flex-1 ${cinematic ? "p-0" : "p-[6px] pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-[6px]"}`}>
         <div className={`lab-layout layout-${view}`}>
           {/* the 3D viewport stays mounted in every mode */}
           <section className={`area-view relative min-h-[300px] overflow-hidden bg-black ${cinematic ? "fixed inset-0 z-30" : "viewport-frame border border-[var(--color-line)]"}`}>
             <motion.div ref={canvasWrap} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: booted ? 1 : 0 }} transition={{ duration: 2.2, ease: "easeOut" }}>
               <WorldCanvas onReady={onReady} />
             </motion.div>
-            {booted && <ViewportHUD compact={!cinematic && mode !== "observe"} />}
+            {booted && <ViewportHUD compact={!cinematic && (mode !== "observe" || small)} />}
             {mode === "observe" && <DiscoveryCard />}
             <DayReportCard />
             <DataPanel />
@@ -381,6 +417,7 @@ export default function LabApp() {
       <SettingsModal />
       <CommandPalette />
       <CatchUpOverlay />
+      <MobileNav />
       {connecting && !showBoot && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80">
           <div className="mono text-[11px] tracking-[0.22em] text-[var(--color-text)]">

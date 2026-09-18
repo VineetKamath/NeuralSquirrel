@@ -20,6 +20,7 @@ import { Predators } from "./Predators";
 import { CameraRig } from "./CameraRig";
 import { SquirrelModel } from "@/components/Squirrel/SquirrelModel";
 import { canvasRegistry } from "./canvasRegistry";
+import { setFurQuality } from "@/components/Squirrel/furMaterial";
 
 patchFogChunks();
 
@@ -116,7 +117,8 @@ export default function WorldCanvas({ onReady }: { onReady?: () => void }) {
   const [experiment, setExperiment] = useState<Experiment>(() => getExperiment());
   const version = useLab((s) => s.version);
   const quality = useLab((s) => s.quality);
-  const dpr: [number, number] = quality === "low" ? [0.7, 1] : quality === "medium" ? [1, 1.25] : [1, 1.5];
+  const dpr: [number, number] = quality === "low" ? [0.75, 1.25] : quality === "medium" ? [1, 1.25] : [1, 1.5];
+  setFurQuality(quality);
 
   useEffect(() => onExperimentChange((e) => setExperiment(e)), []);
 
@@ -125,7 +127,8 @@ export default function WorldCanvas({ onReady }: { onReady?: () => void }) {
       shadows={quality !== "low"}
       dpr={dpr}
       camera={{ fov: 40, near: 0.03, far: 900, position: [0, 3, 6] }}
-      gl={{ antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: false }}
+      key={quality}
+      gl={{ antialias: quality !== "low", powerPreference: "high-performance", preserveDrawingBuffer: false }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 0.85;

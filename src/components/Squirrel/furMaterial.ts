@@ -1,6 +1,11 @@
 import * as THREE from "three";
 
-export const SHELLS = 12;
+/** number of fur shells; lowered on phones (set before the first squirrel is built) */
+export let SHELLS = 12;
+
+export function setFurQuality(quality: "low" | "medium" | "high") {
+  SHELLS = quality === "low" ? 6 : quality === "medium" ? 9 : 12;
+}
 
 /**
  * Shell-textured fur. The mesh is drawn as an InstancedMesh with SHELLS instances;

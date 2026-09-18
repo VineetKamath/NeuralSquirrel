@@ -99,13 +99,13 @@ export function TopBar() {
     <header className="relative z-20 flex h-10 shrink-0 items-center gap-3 whitespace-nowrap border-b border-[var(--color-line)] bg-[#070909]/95 px-3">
       <div className="flex items-center gap-2.5">
         <Logo />
-        <div className="mono hidden text-[11px] tracking-[0.32em] text-[var(--color-bright)] sm:block">
+        <div className="mono text-[10px] tracking-[0.22em] text-[var(--color-bright)] sm:text-[11px] sm:tracking-[0.32em]">
           {subjectTitle(gen)}
           <span className="ml-2 hidden text-[9px] tracking-[0.22em] text-[var(--color-dim)] xl:inline">WATCH A MIND GROW</span>
         </div>
       </div>
-      <Divider />
-      <div className="mono flex items-center gap-2 text-[10px] tracking-[0.2em] text-[var(--color-mid)]">
+      <Divider className="hidden sm:block" />
+      <div className="mono hidden items-center gap-2 text-[10px] tracking-[0.2em] text-[var(--color-mid)] sm:flex">
         EXP <span className="text-[var(--color-bright)]">{pad(n)}</span>
         <span className={`inline-block h-1.5 w-1.5 rounded-full ${!alive ? "bg-[var(--color-dim)]" : running ? "bg-[var(--color-alert)] pulse-soft" : "bg-[var(--color-amber)]"}`} />
         <span className={running ? "text-[var(--color-bright)]" : "text-[var(--color-amber)]"}>{running ? "LIVE" : "PAUSED"}</span>
@@ -166,7 +166,7 @@ export function TopBar() {
         <button className="btn hidden md:block" onClick={() => a.toggle("journalOpen")} title="J">
           JOURNAL
         </button>
-        <button className="btn" data-active={cinematic} onClick={() => a.toggle("cinematic")} title="C">
+        <button className="btn hidden md:block" data-active={cinematic} onClick={() => a.toggle("cinematic")} title="C">
           CINEMATIC
         </button>
         <button className="btn btn-alert hidden sm:block" data-active={recording} onClick={() => a.setRecording(!recording)} title="Record the 3D feed">
@@ -175,7 +175,7 @@ export function TopBar() {
         <button className="btn hidden md:block" data-active={audio} onClick={() => a.toggle("audio")} title="Audio">
           {audio ? "♪" : "♪̸"}
         </button>
-        <button className="btn" onClick={() => a.set({ paletteOpen: true })} title="Command palette (Ctrl/⌘ K)">
+        <button className="btn hidden md:block" onClick={() => a.set({ paletteOpen: true })} title="Command palette (Ctrl/⌘ K)">
           ⌘K
         </button>
         <button className="btn" onClick={() => a.toggle("settingsOpen")} title="Settings (,)">

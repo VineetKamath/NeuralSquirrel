@@ -26,7 +26,7 @@ export function DiscoveryCard() {
           animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, x: 16 }}
           transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
-          className="absolute right-5 top-[118px] z-10 w-[min(340px,calc(100%-40px))]"
+          className="absolute bottom-3 left-3 right-3 z-10 md:bottom-auto md:left-auto md:right-5 md:top-[118px] md:w-[min(340px,calc(100%-40px))]"
         >
           <div className="panel scanlines overflow-hidden !bg-[rgba(8,11,11,0.86)]">
             <motion.div className="h-px bg-[var(--color-signal)]" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.9 }} style={{ transformOrigin: "left" }} />

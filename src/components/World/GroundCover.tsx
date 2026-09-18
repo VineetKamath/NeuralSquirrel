@@ -8,6 +8,7 @@ import { getTerrainData, sampleDataGLSL } from "./terrainData";
 import { focus, U } from "./sharedUniforms";
 import { customFogGLSL } from "./fogChunks";
 import { litterTexture } from "./textures";
+import { useLab } from "@/store/labStore";
 
 const lightingGLSL = /* glsl */ `
 uniform vec3 uSunDir;
@@ -31,9 +32,7 @@ function gridOffsets(radius: number, spacing: number) {
 }
 
 /** GPU grass: a camera-following patch of blades anchored to world cells. */
-function Grass({ world }: { world: WorldModel }) {
-  const RADIUS = 15;
-  const SPACING = 0.11;
+function Grass({ world, RADIUS, SPACING }: { world: WorldModel; RADIUS: number; SPACING: number }) {
   const ref = useRef<THREE.Mesh>(null);
   const { geometry, material } = useMemo(() => {
     const base = new THREE.BufferGeometry();
@@ -156,7 +155,8 @@ void main() {
 }`,
     });
     return { geometry: geo, material: mat };
-  }, [world]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [world, RADIUS, SPACING]);
 
   useFrame(() => {
     const m = material as THREE.ShaderMaterial;
@@ -267,10 +267,13 @@ void main() {
 }
 
 export function GroundCover({ world }: { world: WorldModel }) {
+  const quality = useLab((s) => s.quality);
+  // phones draw far fewer blades (≈9k vs ≈58k) and skip the leaf litter
+  const grass = quality === "low" ? { r: 9, s: 0.17 } : quality === "medium" ? { r: 12, s: 0.13 } : { r: 15, s: 0.11 };
   return (
     <>
-      <Grass world={world} />
-      <Litter world={world} />
+      <Grass key={quality} world={world} RADIUS={grass.r} SPACING={grass.s} />
+      {quality !== "low" && <Litter world={world} />}
     </>
   );
 }

@@ -161,7 +161,8 @@ export function ViewportHUD({ compact = false }: { compact?: boolean }) {
           </div>
         </>
       ) : compact ? (
-        <div className="absolute left-4 top-3">
+        <>
+        <div className="absolute left-3 top-3 max-w-[70%]">
           <div className="mono text-[8.5px] tracking-[0.2em] text-[var(--color-mid)]">
             <span className="text-[var(--color-signal)]">{subjectTitle(snap.generation)}</span> · LIVE FEED · {snap.dateLabel}
           </div>
@@ -169,7 +170,13 @@ export function ViewportHUD({ compact = false }: { compact?: boolean }) {
             {snap.goalLabel}
           </div>
           <RecIndicator />
+          {snap.threatNear && <div className="mono blink mt-1 text-[9.5px] tracking-[0.2em] text-[var(--color-alert)]">▲ {snap.threatLabel}</div>}
+          {snap.inDrey && <div className="mono mt-1 text-[9px] tracking-[0.2em] text-[var(--color-amber)]">⌂ ASLEEP IN DREY</div>}
         </div>
+        <div className="pointer-events-auto absolute bottom-3 right-3 h-[92px] w-[92px] overflow-hidden rounded-full border border-[var(--color-line-strong)] opacity-90 md:hidden" title="Open the map">
+          <MapView compact initialLayers={["memories", "caches", "rivals", "predators", "trail"]} />
+        </div>
+        </>
       ) : (
         <>
           <div className="absolute left-6 top-5">

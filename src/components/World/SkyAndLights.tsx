@@ -6,10 +6,13 @@ import * as THREE from "three";
 import type { Experiment } from "@/simulation/Experiment";
 import { createEnv, updateEnv } from "./environment";
 import { focus, U } from "./sharedUniforms";
+import { useLab } from "@/store/labStore";
 
 /** Sky dome, sun/moon light, hemisphere light, fog and shared uniforms. */
 export function SkyAndLights({ experiment }: { experiment: Experiment }) {
   const { scene, gl } = useThree();
+  const quality = useLab((s) => s.quality);
+  const shadowSize = quality === "high" ? 2048 : 1024;
   const sun = useRef<THREE.DirectionalLight>(null);
   const hemi = useRef<THREE.HemisphereLight>(null);
   const env = useMemo(() => createEnv(), []);
@@ -136,11 +139,12 @@ void main() {
       <primitive object={sky} />
       <hemisphereLight ref={hemi} args={["#9fb4c8", "#3a3322", 1]} />
       <directionalLight
+        key={shadowSize}
         ref={sun}
-        castShadow
+        castShadow={quality !== "low"}
         intensity={2}
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={shadowSize}
+        shadow-mapSize-height={shadowSize}
         shadow-camera-left={-38}
         shadow-camera-right={38}
         shadow-camera-top={38}

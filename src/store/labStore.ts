@@ -27,6 +27,7 @@ import { DAY_LENGTH, TIME_SCALES } from "@/simulation/constants";
 import { COMPARABLE } from "@/real/census";
 import { realDateString } from "@/utils/format";
 import { LIVE } from "./liveMode";
+import { detectQuality } from "@/utils/device";
 
 export const SPEEDS = TIME_SCALES.map((t) => t.speed);
 
@@ -386,7 +387,7 @@ export const useLab = create<LabState>((set, get) => ({
   truthMap: false,
   autosave: true,
   catchUp: true,
-  quality: "high",
+  quality: typeof window !== "undefined" ? detectQuality() : "high",
   lastSaved: 0,
   catchingUp: null,
   server: { url: "http://localhost:4317", connected: false, status: "" },
