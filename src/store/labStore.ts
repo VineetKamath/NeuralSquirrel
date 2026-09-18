@@ -157,6 +157,7 @@ interface LabState {
   dataOpen: boolean;
   archiveOpen: boolean;
   journalOpen: boolean;
+  aboutOpen: boolean;
   settingsOpen: boolean;
   paletteOpen: boolean;
   overlays: boolean;
@@ -197,7 +198,7 @@ interface LabState {
   setSpeed: (v: number) => void;
   setMode: (m: LabMode) => void;
   toggle: (
-    key: "cinematic" | "mapOpen" | "dataOpen" | "archiveOpen" | "overlays" | "audio" | "autoSlow" | "truthMap" | "journalOpen" | "settingsOpen" | "paletteOpen" | "autosave" | "catchUp"
+    key: "cinematic" | "mapOpen" | "dataOpen" | "archiveOpen" | "overlays" | "audio" | "autoSlow" | "truthMap" | "journalOpen" | "aboutOpen" | "settingsOpen" | "paletteOpen" | "autosave" | "catchUp"
   ) => void;
   set: (patch: Partial<LabState>) => void;
   setRecording: (v: boolean) => void;
@@ -388,6 +389,7 @@ export const useLab = create<LabState>((set, get) => ({
   dataOpen: false,
   archiveOpen: false,
   journalOpen: false,
+  aboutOpen: false,
   settingsOpen: false,
   paletteOpen: false,
   overlays: true,

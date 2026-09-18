@@ -39,6 +39,7 @@ function commands(): Command[] {
     { id: "map", label: "Open map overlay", group: "VIEW", keys: "M", run: () => a.toggle("mapOpen") },
     { id: "journal", label: "Open field journal", group: "EXPERIMENT", keys: "J", run: () => a.toggle("journalOpen") },
     { id: "settings", label: "Open settings", group: "EXPERIMENT", keys: ",", run: () => a.toggle("settingsOpen") },
+    { id: "about", label: "About Nut the Squirrel · built by Vineet Kamath", group: "EXPERIMENT", keys: "A", run: () => a.toggle("aboutOpen") },
     { id: "archive", label: "Open experiment archive", group: "EXPERIMENT", run: () => a.toggle("archiveOpen") },
     { id: "save", label: "Save experiment now", group: "EXPERIMENT", run: () => void a.saveNow(getExperiment()) },
     { id: "export", label: "Export snapshot file", group: "EXPERIMENT", run: downloadSnapshot },

@@ -175,6 +175,10 @@ export function TopBar() {
         <button className="btn hidden md:block" data-active={audio} onClick={() => a.toggle("audio")} title="Audio">
           {audio ? "♪" : "♪̸"}
         </button>
+        <button className="btn" onClick={() => a.toggle("aboutOpen")} title="About the project (A)">
+          <span className="md:hidden">ⓘ</span>
+          <span className="hidden md:inline">ABOUT</span>
+        </button>
         <button className="btn hidden md:block" onClick={() => a.set({ paletteOpen: true })} title="Command palette (Ctrl/⌘ K)">
           ⌘K
         </button>

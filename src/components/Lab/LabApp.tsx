@@ -35,6 +35,7 @@ import { PanelHeader } from "@/components/Telemetry/PanelHeader";
 import { DayReportCard, JournalModal, JournalPanel } from "./Journal";
 import { SettingsModal, setSpeedEverywhere } from "./Settings";
 import { CommandPalette } from "./CommandPalette";
+import { AboutModal } from "./About";
 import { getAudio } from "@/audio/AudioEngine";
 import { pad } from "@/utils/format";
 import { useSmallScreen } from "@/utils/device";
@@ -81,8 +82,10 @@ function useKeyboard() {
       else if (e.key === "o") s.toggle("overlays");
       else if (e.key === "j") s.toggle("journalOpen");
       else if (e.key === ",") s.toggle("settingsOpen");
+      else if (e.key === "a") s.toggle("aboutOpen");
       else if (e.key === "Escape") {
-        if (s.settingsOpen) s.toggle("settingsOpen");
+        if (s.aboutOpen) s.toggle("aboutOpen");
+        else if (s.settingsOpen) s.toggle("settingsOpen");
         else if (s.journalOpen) s.toggle("journalOpen");
         else if (s.mapOpen) s.toggle("mapOpen");
         else if (s.cinematic) s.toggle("cinematic");
@@ -414,6 +417,7 @@ export default function LabApp() {
 
       <ArchiveModal />
       <JournalModal />
+      <AboutModal />
       <SettingsModal />
       <CommandPalette />
       <CatchUpOverlay />
