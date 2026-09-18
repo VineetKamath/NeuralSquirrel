@@ -1,4 +1,23 @@
-# SQUIRREL LAB — Watch a Mind Grow
+<div align="center">
+
+# 🐿️ Nut the Squirrel
+
+### Squirrel Lab: Watch a Mind Grow
+
+**An artificial squirrel with a spiking neural brain, living in a real-data Central Park. Live 24/7.**
+
+[![Live](https://img.shields.io/badge/LIVE-24%2F7-ff5f4f?style=for-the-badge)](https://neural-squirrel.onrender.com)
+[![Watch Nut](https://img.shields.io/badge/Watch%20Nut%20live-neural--squirrel.onrender.com-8fe3c4?style=for-the-badge)](https://neural-squirrel.onrender.com)
+
+[![Nut the Squirrel, live: Observe mode](docs/screenshot.png)](https://neural-squirrel.onrender.com)
+
+<sub>Observe mode: the live 3D feed, Nut's drives and memories, and the spiking brain lighting up in real time.</sub>
+
+**[▶ Watch Nut live →](https://neural-squirrel.onrender.com)**
+
+</div>
+
+---
 
 Meet **Nut**, an eastern gray squirrel with diamond paws: she stacks acorns through every winter and never sells her caches.
 
@@ -32,6 +51,12 @@ npm run build && npm start
 - **NEUROSCIENCE:** live spike raster of all 846 neurons, rotating connectome, neuron inspector with membrane-potential recording, place fields and grid-cell rate maps, decision sources (drive vs. Q-learning vs. striatal spikes), dopamine / TD error, sleep-replay log.
 - **ECOLOGY:** interactive site map with hillshade, 1 m contours, OSM land cover, cognitive map, danger, caches, place cells, census sightings, squirrels, predators, trail and events. Includes pan/zoom, click-to-inspect and a time-lapse scrubber. Also: the real weather record, population and lineage, census calibration, data provenance and the field journal.
 - **CINEMATIC:** letterboxed automatic camera director with REC.
+
+<p align="center">
+  <a href="https://neural-squirrel.onrender.com"><img src="docs/screenshot2.png" alt="Neuroscience mode: spike raster, connectome, place fields, decision sources and dopamine" /></a>
+  <br />
+  <sub>Neuroscience mode: every spike of all 846 neurons, place fields, what drove each decision, and dopamine prediction errors.</sub>
+</p>
 
 ### Keys
 
