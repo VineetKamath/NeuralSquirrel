@@ -1,10 +1,11 @@
-# Free Hugging Face Spaces pause after 48 hours without visitors; a visit every 6 hours keeps the lab running.
-# Repository variable LIVE_URL: the public URL of the lab (e.g. https://your-username-squirrel-lab.hf.space)
+# Free Render services sleep after 15 minutes without visitors; this visits the lab every 10 minutes.
+# Repository variable LIVE_URL: the public URL of the lab (e.g. https://neural-squirrel.onrender.com)
+# GitHub may delay scheduled runs, so also add the URL to a free uptime monitor (see README).
 name: Keep the live lab awake
 
 on:
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -12,4 +13,4 @@ jobs:
     if: ${{ vars.LIVE_URL != '' }}
     runs-on: ubuntu-latest
     steps:
-      - run: curl -fsS --retry 3 --max-time 60 "${{ vars.LIVE_URL }}/api/status"
+      - run: curl -fsS --retry 3 --max-time 90 "${{ vars.LIVE_URL }}/healthz"

@@ -1,0 +1,22 @@
+# Render blueprint: Dashboard → New → Blueprint → pick this repository.
+services:
+  - type: web
+    name: neural-squirrel
+    runtime: node
+    plan: free
+    buildCommand: npm ci --no-audit --no-fund && npm run build:live
+    startCommand: npm run start:live
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: LAB_SPEED
+        value: "1"
+      - key: LAB_SAVE
+        value: /tmp/squirrel-lab/save.json
+      # optional: keep the experiment across restarts in a Hugging Face dataset
+      - key: HF_TOKEN
+        sync: false
+      - key: HF_SAVE_REPO
+        sync: false

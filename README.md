@@ -80,19 +80,20 @@ npm run build:live     # static spectator site → out/
 npm run start:live     # server + site on http://localhost:4317
 ```
 
-### Free hosting on Hugging Face Spaces (no credit card)
+### Free hosting on Render
 
-1. Create a Hugging Face account, then a new **Space**. Choose **Docker** as the SDK and the free CPU hardware.
-2. Create a Hugging Face **access token** with write permission.
-3. In this GitHub repository, go to **Settings → Secrets and variables → Actions** and add:
-   - secret `HF_TOKEN`: the token
-   - variable `HF_SPACE`: `your-username/space-name`
-   - variable `LIVE_URL`: `https://your-username-space-name.hf.space`
-4. Push to `main`. The *Deploy to Hugging Face Space* workflow publishes it, and the *keep-alive* workflow visits it every 6 hours so the free Space never pauses.
-5. Optional, recommended: keep the experiment across Space restarts.
-   - Create a private Hugging Face **dataset** (e.g. `your-username/squirrel-lab-save`).
-   - In the Space settings, add the secret `HF_TOKEN` and the variable `HF_SAVE_REPO=your-username/squirrel-lab-save`.
-   - The server then commits its save there every 30 minutes and resumes from it after a restart.
+The server is light: at the default speed it uses about 0.2% of one CPU core, so Render's free plan is enough.
+
+1. Sign up at render.com with your GitHub account.
+2. Choose **New → Blueprint**, pick this repository and confirm. Render reads `render.yaml`, builds the site and starts the server. Every push to `main` redeploys it.
+3. Keep it awake. Free Render services sleep after 15 minutes without visitors.
+   - Add a free monitor at uptimerobot.com (or cron-job.org) that visits `https://<your-service>.onrender.com/healthz` every 5 minutes.
+   - As a backup, add the GitHub repository variable `LIVE_URL`. The *keep-alive* workflow then also visits the lab every 10 minutes.
+4. Optional, recommended: keep the experiment across restarts. Free services have no disk, and redeploys restart the server.
+   - Create a free Hugging Face account and a private **dataset** (e.g. `your-username/neural-squirrel-save`).
+   - Create a write token.
+   - In the Render service's **Environment** settings, set `HF_TOKEN` and `HF_SAVE_REPO`.
+   - The server saves there every 30 minutes and resumes from it after a restart.
 
 ### Any always-on machine
 
