@@ -27,3 +27,23 @@ export function realDateString(time: number) {
 
 export const pct = (v: number) => `${Math.round(v * 100)}%`;
 export const signed = (v: number, d = 2) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(d)}`;
+
+const ROMAN: [number, string][] = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]];
+
+function roman(n: number) {
+  let out = "";
+  for (const [v, r] of ROMAN) while (n >= v) {
+    out += r;
+    n -= v;
+  }
+  return out;
+}
+
+/** the subject is Nut; successors in the lineage are Nut II, Nut III, … */
+export function subjectName(generation = 1) {
+  return generation <= 1 ? "NUT" : `NUT ${roman(generation)}`;
+}
+
+export function subjectTitle(generation = 1) {
+  return `${subjectName(generation)} THE SQUIRREL`;
+}

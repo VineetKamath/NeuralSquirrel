@@ -9,7 +9,7 @@ import { CENSUS, COMPARABLE } from "@/real/census";
 import { SITE } from "@/real/siteConfig";
 import { formatDate, localTime } from "@/real/calendar";
 import { SITE_META } from "@/real/site";
-import { pad } from "@/utils/format";
+import { pad, subjectName } from "@/utils/format";
 
 const FUR: Record<string, string> = { Gray: "#b9c0c4", Cinnamon: "#d08a52", Black: "#6a6a64" };
 
@@ -104,7 +104,7 @@ export function PopulationPanel({ index = "E3" }: { index?: string }) {
               <span className="text-[var(--color-dim)]">G{pad(l.generation)}</span>
               <span className="flex items-center gap-1.5 truncate">
                 <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FUR[l.fur] ?? "#999" }} />
-                {l.cause.toUpperCase()}
+                {subjectName(l.generation)} · {l.cause.toUpperCase()}
               </span>
               <span className="tabular text-right">{l.daysAlive.toFixed(1)} d</span>
             </div>
@@ -113,7 +113,7 @@ export function PopulationPanel({ index = "E3" }: { index?: string }) {
             <span>G{pad(gen)}</span>
             <span className="flex items-center gap-1.5">
               <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FUR[fur] ?? "#999" }} />
-              LIVING
+              {subjectName(gen)} · LIVING
             </span>
             <span className="tabular text-right">{age.toFixed(1)} d</span>
           </div>

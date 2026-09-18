@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLab, type LabMode } from "@/store/labStore";
 import { TIME_SCALES } from "@/simulation/constants";
-import { pad } from "@/utils/format";
+import { pad, subjectTitle } from "@/utils/format";
 import { pushControl } from "@/store/serverLink";
 import { setSpeedEverywhere } from "@/components/Lab/Settings";
 import { LIVE } from "@/store/liveMode";
@@ -99,7 +99,10 @@ export function TopBar() {
     <header className="relative z-20 flex h-10 shrink-0 items-center gap-3 whitespace-nowrap border-b border-[var(--color-line)] bg-[#070909]/95 px-3">
       <div className="flex items-center gap-2.5">
         <Logo />
-        <div className="mono hidden text-[11px] tracking-[0.32em] text-[var(--color-bright)] sm:block">SQUIRREL LAB</div>
+        <div className="mono hidden text-[11px] tracking-[0.32em] text-[var(--color-bright)] sm:block">
+          {subjectTitle(gen)}
+          <span className="ml-2 hidden text-[9px] tracking-[0.22em] text-[var(--color-dim)] xl:inline">SQUIRREL LAB</span>
+        </div>
       </div>
       <Divider />
       <div className="mono flex items-center gap-2 text-[10px] tracking-[0.2em] text-[var(--color-mid)]">

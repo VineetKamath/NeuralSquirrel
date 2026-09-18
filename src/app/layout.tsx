@@ -7,8 +7,8 @@ import "@fontsource/inter-tight/600.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Squirrel Lab — Artificial Animal Experiment",
-  description: "Observation interface for an autonomous artificial squirrel whose simulated cognition develops through experience.",
+  title: "Nut the Squirrel — Squirrel Lab",
+  description: "Watch Nut the Squirrel live, 24/7: an autonomous squirrel with a spiking neural brain living in a real-data Central Park.",
 };
 
 export const viewport: Viewport = {

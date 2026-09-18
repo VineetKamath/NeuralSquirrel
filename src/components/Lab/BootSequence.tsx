@@ -82,10 +82,10 @@ export function BootSequence({
     >
       <div className="mono w-[min(520px,90vw)] text-[12px] leading-[1.9] tracking-[0.18em] text-[#b9c4c0]">
         <Line show={step >= 1} className="text-[15px] tracking-[0.42em] text-[#eef4f1]">
-          SQUIRREL LAB
+          NUT THE SQUIRREL
         </Line>
         <Line show={step >= 2} className="text-[#6e7a76]">
-          ARTIFICIAL ANIMAL RESEARCH UNIT · SUBJECT: NUT
+          SQUIRREL LAB · A NEURAL ANIMAL EXPERIMENT
         </Line>
         <div className="h-4" />
         <Line show={step >= 3}>

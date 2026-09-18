@@ -9,7 +9,7 @@ import { pad } from "@/utils/format";
 import { Modal } from "./Modal";
 
 function exportText(entries: JournalEntry[], n: number) {
-  const lines = [`SQUIRREL LAB — EXPERIMENT ${pad(n)} — FIELD JOURNAL`, ""];
+  const lines = [`NUT THE SQUIRREL — SQUIRREL LAB EXPERIMENT ${pad(n)} — FIELD JOURNAL`, ""];
   for (const e of entries) {
     lines.push(`DAY ${e.day} · ${e.date} · GENERATION ${e.generation}`, e.title, e.weather, ...e.body, e.stats.map((s) => `${s.label}: ${s.value}`).join(" · "), "");
   }

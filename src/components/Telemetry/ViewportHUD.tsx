@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLab } from "@/store/labStore";
 import { frameStats } from "@/store/runtime";
-import { clockString, dayString, pad } from "@/utils/format";
+import { clockString, dayString, pad, subjectTitle } from "@/utils/format";
 import { cinematicState } from "@/components/World/cinematicState";
 import { MapView } from "@/components/Map/MapView";
 
@@ -132,8 +132,8 @@ export function ViewportHUD({ compact = false }: { compact?: boolean }) {
       {cinematic ? (
         <>
           <div className="absolute left-7 top-[calc(7%+14px)]">
-            <div className="mono text-[11px] tracking-[0.36em] text-[var(--color-bright)]">SQUIRREL LAB</div>
-            <div className="mono mt-0.5 text-[10px] tracking-[0.28em] text-[var(--color-mid)]">EXPERIMENT {pad(n)}</div>
+            <div className="mono text-[14px] tracking-[0.36em] text-[var(--color-bright)]">{subjectTitle(snap.generation)}</div>
+            <div className="mono mt-0.5 text-[10px] tracking-[0.28em] text-[var(--color-mid)]">SQUIRREL LAB · EXPERIMENT {pad(n)}</div>
             <div className="mono tabular mt-3 text-[10px] tracking-[0.2em] text-[var(--color-text)]">{dayString(snap.time)}</div>
           </div>
           <div className="absolute right-7 top-[calc(7%+14px)] flex flex-col items-end gap-1">
@@ -162,7 +162,9 @@ export function ViewportHUD({ compact = false }: { compact?: boolean }) {
         </>
       ) : compact ? (
         <div className="absolute left-4 top-3">
-          <div className="mono text-[8.5px] tracking-[0.2em] text-[var(--color-mid)]">LIVE FEED · {snap.dateLabel}</div>
+          <div className="mono text-[8.5px] tracking-[0.2em] text-[var(--color-mid)]">
+            <span className="text-[var(--color-signal)]">{subjectTitle(snap.generation)}</span> · LIVE FEED · {snap.dateLabel}
+          </div>
           <div className={`mono mt-0.5 text-[11px] tracking-[0.14em] ${snap.goalType === "FLEE" || snap.goalType === "HIDE" ? "text-[var(--color-alert)]" : "text-[var(--color-bright)]"}`} style={{ textShadow: "0 1px 8px rgba(0,0,0,0.8)" }}>
             {snap.goalLabel}
           </div>
@@ -171,7 +173,10 @@ export function ViewportHUD({ compact = false }: { compact?: boolean }) {
       ) : (
         <>
           <div className="absolute left-6 top-5">
-            <div className="mono text-[9px] tracking-[0.22em] text-[var(--color-mid)]">NUT · SUBJECT S-{pad(n)} · GEN {snap.generation} · SCIURUS CAROLINENSIS · {snap.fur.toUpperCase()}</div>
+            <div className="mono text-[12px] tracking-[0.3em] text-[var(--color-signal)]" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.8)" }}>
+              {subjectTitle(snap.generation)}
+            </div>
+            <div className="mono mt-0.5 text-[9px] tracking-[0.22em] text-[var(--color-mid)]">SUBJECT S-{pad(n)} · GEN {snap.generation} · SCIURUS CAROLINENSIS · {snap.fur.toUpperCase()}</div>
             <div className={`mono mt-1 text-[13px] tracking-[0.16em] ${snap.goalType === "FLEE" || snap.goalType === "HIDE" ? "text-[var(--color-alert)]" : "text-[var(--color-bright)]"}`} style={{ textShadow: "0 1px 8px rgba(0,0,0,0.8)" }}>
               {snap.goalLabel}
             </div>
