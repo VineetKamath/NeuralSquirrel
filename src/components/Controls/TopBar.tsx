@@ -144,7 +144,7 @@ export function TopBar() {
         {LIVE ? (
           <span className="mono flex items-center gap-1.5 border border-[rgba(255,95,79,0.35)] px-2 py-[5px] text-[9.5px] tracking-[0.16em] text-[var(--color-text)]" title="Everyone watches the same experiment, running 24/7">
             <span className="blink inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-alert)]" />
-            LIVE 24/7<span className="hidden text-[var(--color-dim)] lg:inline"> · {server.status.replace(/^LIVE · /, "")}</span>
+            LIVE 24/7<span className="hidden text-[var(--color-dim)] lg:inline"> · {(server.status ?? "").replace(/^LIVE · /, "")}</span>
           </span>
         ) : (
           <>

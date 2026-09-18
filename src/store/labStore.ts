@@ -343,9 +343,20 @@ let lastThoughtId = 0;
 let lastJournal = 0;
 
 const PREFS_KEY = "squirrel-lab:prefs:v2";
+const QUALITIES = ["low", "medium", "high"];
+
+/** saved viewer preferences, validated field by field (older saves may be partial) */
 function loadPrefs(): Partial<LabState> {
   try {
-    return JSON.parse(localStorage.getItem(PREFS_KEY) ?? "{}");
+    const raw = JSON.parse(localStorage.getItem(PREFS_KEY) ?? "{}") as Record<string, unknown>;
+    const out: Partial<LabState> = {};
+    for (const k of ["audio", "overlays", "autoSlow", "autosave", "catchUp"] as const) if (typeof raw[k] === "boolean") out[k] = raw[k] as boolean;
+    if (typeof raw.quality === "string" && QUALITIES.includes(raw.quality)) out.quality = raw.quality as LabState["quality"];
+    // spectators always follow the server's speed
+    if (!LIVE && typeof raw.speed === "number" && raw.speed > 0 && raw.speed <= 100) out.speed = raw.speed;
+    const server = raw.server as { url?: unknown } | undefined;
+    if (!LIVE && typeof server?.url === "string") out.server = { url: server.url, connected: false, status: "" };
+    return out;
   } catch {
     return {};
   }
