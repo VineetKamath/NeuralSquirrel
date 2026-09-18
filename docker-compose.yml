@@ -1,0 +1,14 @@
+# For any always-on machine (e.g. an Oracle Cloud Always Free VM): docker compose up -d
+services:
+  squirrel-lab:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "80:7860"
+    environment:
+      LAB_SPEED: "1"
+      LAB_SAVE: /data/save.json
+    volumes:
+      - lab-data:/data
+volumes:
+  lab-data:
