@@ -1,4 +1,4 @@
-# SQUIRREL LAB — A Neural Animal Experiment
+# SQUIRREL LAB — Watch a Mind Grow
 
 Meet **Nut**, an eastern gray squirrel with diamond paws: she stacks acorns through every winter and never sells her caches.
 

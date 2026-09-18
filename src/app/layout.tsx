@@ -7,7 +7,7 @@ import "@fontsource/inter-tight/600.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nut the Squirrel — Squirrel Lab",
+  title: "Nut the Squirrel — Watch a Mind Grow",
   description: "Watch Nut the Squirrel live, 24/7: an autonomous squirrel with a spiking neural brain living in a real-data Central Park.",
 };
 

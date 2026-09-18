@@ -101,7 +101,7 @@ export function TopBar() {
         <Logo />
         <div className="mono hidden text-[11px] tracking-[0.32em] text-[var(--color-bright)] sm:block">
           {subjectTitle(gen)}
-          <span className="ml-2 hidden text-[9px] tracking-[0.22em] text-[var(--color-dim)] xl:inline">SQUIRREL LAB</span>
+          <span className="ml-2 hidden text-[9px] tracking-[0.22em] text-[var(--color-dim)] xl:inline">WATCH A MIND GROW</span>
         </div>
       </div>
       <Divider />

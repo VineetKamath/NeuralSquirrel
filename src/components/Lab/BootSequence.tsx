@@ -85,7 +85,7 @@ export function BootSequence({
           NUT THE SQUIRREL
         </Line>
         <Line show={step >= 2} className="text-[#6e7a76]">
-          SQUIRREL LAB · A NEURAL ANIMAL EXPERIMENT
+          SQUIRREL LAB · WATCH A MIND GROW
         </Line>
         <div className="h-4" />
         <Line show={step >= 3}>
