@@ -218,6 +218,8 @@ async function main() {
     if (!existsSync(file) || statSync(file).isDirectory()) file = join(file, "index.html");
     if (!existsSync(file) && existsSync(`${join(STATIC, rel)}.html`)) file = `${join(STATIC, rel)}.html`;
     if (!existsSync(file)) {
+      // missing build assets are a real 404 (an old cached page must not receive HTML as JavaScript)
+      if (rel.startsWith("_next") || extname(rel)) return false;
       file = join(STATIC, "index.html");
       if (!existsSync(file)) return false;
     }
