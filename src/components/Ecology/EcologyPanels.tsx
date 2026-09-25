@@ -65,6 +65,24 @@ export const WeatherPanel = memo(function WeatherPanel({ index = "E2" }: { index
 });
 
 /** resident squirrels (seeded from 2018 census activity centres) and the subject's lineage */
+/** past generations: memoised because the panel itself redraws with the living subject's age */
+const LineageRows = memo(function LineageRows({ lineage }: { lineage: ReturnType<typeof useLab.getState>["lineage"] }) {
+  return (
+    <>
+      {lineage.map((l) => (
+        <div key={l.generation} className="mono grid grid-cols-[30px_1fr_52px] gap-x-2 py-[2px] text-[9.5px] text-[var(--color-mid)]">
+          <span className="text-[var(--color-dim)]">G{pad(l.generation)}</span>
+          <span className="flex items-center gap-1.5 truncate">
+            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FUR[l.fur] ?? "#999" }} />
+            {subjectName(l.generation)} · {l.cause.toUpperCase()}
+          </span>
+          <span className="tabular text-right">{l.daysAlive.toFixed(1)} d</span>
+        </div>
+      ))}
+    </>
+  );
+});
+
 export function PopulationPanel({ index = "E3" }: { index?: string }) {
   const rivals = useLab((s) => s.snap?.rivals ?? []);
   const lineage = useLab((s) => s.lineage);
@@ -99,16 +117,7 @@ export function PopulationPanel({ index = "E3" }: { index?: string }) {
         </div>
         <div>
           <div className="label mb-1">LINEAGE</div>
-          {lineage.map((l) => (
-            <div key={l.generation} className="mono grid grid-cols-[30px_1fr_52px] gap-x-2 py-[2px] text-[9.5px] text-[var(--color-mid)]">
-              <span className="text-[var(--color-dim)]">G{pad(l.generation)}</span>
-              <span className="flex items-center gap-1.5 truncate">
-                <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: FUR[l.fur] ?? "#999" }} />
-                {subjectName(l.generation)} · {l.cause.toUpperCase()}
-              </span>
-              <span className="tabular text-right">{l.daysAlive.toFixed(1)} d</span>
-            </div>
-          ))}
+          <LineageRows lineage={lineage} />
           <div className="mono grid grid-cols-[30px_1fr_52px] gap-x-2 py-[2px] text-[9.5px] text-[var(--color-signal)]">
             <span>G{pad(gen)}</span>
             <span className="flex items-center gap-1.5">

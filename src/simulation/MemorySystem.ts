@@ -129,10 +129,18 @@ export class MemorySystem {
     // counting 10k cells is costly; the value changes slowly, so refresh a few times per second of sim
     this.exploredStamp++;
     if (this.exploredStamp % 25 !== 0) return this.exploredCache;
+    this.exploredCache = this.exploredNow();
+    return this.exploredCache;
+  }
+
+  /**
+   * The same measure without touching the simulation's cache. Displays must use this: a read that
+   * advanced the cache would change the subject's decisions, and spectators would drift from the server.
+   */
+  exploredNow() {
     let n = 0;
     for (let i = 0; i < this.familiarity.length; i++) if (this.familiarity[i] > 0.08) n++;
-    this.exploredCache = n / this.familiarity.length;
-    return this.exploredCache;
+    return n / this.familiarity.length;
   }
 
   markDanger(pos: Vector3, strength: number) {

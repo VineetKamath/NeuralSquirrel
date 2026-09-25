@@ -21,6 +21,7 @@ import { CameraRig } from "./CameraRig";
 import { SquirrelModel } from "@/components/Squirrel/SquirrelModel";
 import { canvasRegistry } from "./canvasRegistry";
 import { setFurQuality } from "@/components/Squirrel/furMaterial";
+import { LIVE, liveTarget, requestCatchUpPull } from "@/store/liveMode";
 
 patchFogChunks();
 
@@ -38,7 +39,13 @@ function SimDriver({ experiment }: { experiment: Experiment }) {
   useFrame((_, dt) => {
     const store = useLab.getState();
     const t = timers.current;
-    if (store.booted && store.running && !store.catchingUp) {
+    const target = LIVE ? liveTarget() : null;
+    if (target !== null) {
+      // spectators follow the server's clock: slow frames are made up next frame instead of drifting,
+      // and a gap too large to simulate smoothly is downloaded instead
+      if (target - experiment.time > 90 * Math.max(1, store.speed)) requestCatchUpPull();
+      else if (store.booted) frameStats.steps = experiment.advanceTo(target, store.speed, store.quality === "low" ? 6 : 9);
+    } else if (store.booted && store.running && !store.catchingUp) {
       frameStats.steps = experiment.advance(dt, store.speed);
     }
     t.frames++;

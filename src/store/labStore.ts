@@ -207,7 +207,7 @@ interface LabState {
   dismissDiscovery: () => void;
   newExperiment: (seed?: number) => void;
   resetExperiment: () => void;
-  loadSnapshot: (exp: Experiment) => void;
+  loadSnapshot: (exp: Experiment, soft?: boolean) => void;
   publish: (exp: Experiment) => void;
   publishSlow: (exp: Experiment) => void;
   persist: (exp: Experiment) => void;
@@ -270,7 +270,7 @@ function buildSnapshot(exp: Experiment): Snapshot {
     vigilance: learning.vigilance,
     audienceCaution: learning.audienceCaution,
     encodingPrecision: memory.encodingPrecision,
-    explored: memory.exploredFraction(),
+    explored: memory.exploredNow(),
     qStates: learning.tableSize(),
     qUpdates: learning.updates,
     decisionConfidence: learning.decisionConfidence,
@@ -507,7 +507,7 @@ export const useLab = create<LabState>((set, get) => ({
     get().publishSlow(exp);
   },
 
-  loadSnapshot: (exp) => {
+  loadSnapshot: (exp, soft = false) => {
     lastEventId = exp.ctx.events.lastId;
     lastRewardId = exp.ctx.rewards.lastId;
     lastThoughtId = exp.ctx.brain.lastThoughtId;
@@ -515,7 +515,8 @@ export const useLab = create<LabState>((set, get) => ({
     set((s) => ({
       experimentNumber: exp.number,
       seed: exp.seed,
-      version: s.version + 1,
+      // a soft resync keeps the 3D scene mounted
+      version: soft ? s.version : s.version + 1,
       events: exp.ctx.events.log.slice(-160),
       discovery: null,
       discoveryQueue: [],
@@ -558,13 +559,15 @@ export const useLab = create<LabState>((set, get) => ({
   },
 
   publishSlow: (exp) => {
-    set({
-      history: exp.metrics.history.slice(),
-      days: exp.metrics.days.slice(),
-      profile: exp.profile(),
-      lineage: exp.lineage.slice(),
-      journal: exp.journal.entries.slice(),
-    });
+    // long experiments carry thousands of days: only hand React a new array when one actually changed
+    const st = get();
+    const changed = <T,>(prev: T[], next: T[]) => prev.length !== next.length || prev[prev.length - 1] !== next[next.length - 1];
+    const patch: Partial<LabState> = { profile: exp.profile() };
+    if (changed(st.history, exp.metrics.history)) patch.history = exp.metrics.history.slice();
+    if (changed(st.days, exp.metrics.days)) patch.days = exp.metrics.days.slice();
+    if (changed(st.lineage, exp.lineage)) patch.lineage = exp.lineage.slice();
+    if (changed(st.journal, exp.journal.entries)) patch.journal = exp.journal.entries.slice();
+    set(patch);
   },
 
   persist: (exp) => {
@@ -595,8 +598,9 @@ export const useLab = create<LabState>((set, get) => ({
   },
 }));
 
-export async function resumeFromSnapshot(snap: Parameters<typeof restoreExperiment>[0]) {
-  const exp = restoreExperiment(snap);
-  useLab.getState().loadSnapshot(exp);
+export async function resumeFromSnapshot(snap: Parameters<typeof restoreExperiment>[0], soft = false) {
+  const before = soft ? getExperiment().world : null;
+  const exp = restoreExperiment(snap, soft);
+  useLab.getState().loadSnapshot(exp, exp.world === before);
   return exp;
 }

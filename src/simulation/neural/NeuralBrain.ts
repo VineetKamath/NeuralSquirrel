@@ -721,7 +721,7 @@ export class NeuralBrain {
       totalSpikes: this.totalSpikes,
       learningEvents: this.learningEvents,
       neurogenesis: this.neurogenesis,
-      replays: this.replays.slice(-20),
+      replays: this.replays.slice(),
       vPrev: this.vPrev,
       // live dynamics (exact continuation for spectators mirroring the live server)
       dyn: {

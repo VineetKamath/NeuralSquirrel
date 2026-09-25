@@ -95,12 +95,16 @@ export class Experiment {
   trailCount = 0;
   private trailTimer = 0;
 
-  constructor(seed: number, number: number) {
+  /**
+   * `reuse`: an existing world of the same seed to regenerate in place instead of allocating a new
+   * one. The result is identical to a fresh world, but renderers holding it keep their meshes.
+   */
+  constructor(seed: number, number: number, reuse?: WorldModel) {
     this.seed = seed;
     this.number = number;
     this.personality = generatePersonality(seed);
     const rng = mulberry32(seed);
-    const world = new WorldModel(seed);
+    const world = reuse && reuse.state.seed === seed ? Object.assign(reuse, new WorldModel(seed)) : new WorldModel(seed);
     this.genome = { personality: this.personality, innate: new Float32Array(NeuralBrain.genomeSize).fill(1), fur: sampleFur(rng) };
     this.ctx = this.buildContext(world, rng, this.genome);
     this.agent = new SquirrelAgent(this.ctx, { fur: this.genome.fur, generation: 1 });
@@ -410,6 +414,24 @@ export class Experiment {
     return steps;
   }
 
+  /**
+   * Live mirror: step toward a target sim time in the same fixed steps the lab server uses (so the
+   * copy stays identical), within a per-frame time budget. Returns steps run.
+   */
+  advanceTo(target: number, speed: number, budgetMs = 8) {
+    const dt = speed >= 50 ? FIXED_DT * 2 : FIXED_DT;
+    this.agent.neuralWindowMs = speed >= 50 ? 20 : speed >= 10 ? 35 : 50;
+    const start = performance.now();
+    let steps = 0;
+    while (this.time + dt <= target && performance.now() - start < budgetMs) {
+      this.step(dt);
+      steps++;
+    }
+    this.effectiveRate += (speed - this.effectiveRate) * 0.1;
+    this.lastWall = Date.now();
+    return steps;
+  }
+
   /** run a block of simulated time as fast as possible (offline catch-up) */
   fastForward(simSeconds: number, budgetMs = 40) {
     const start = performance.now();
@@ -514,8 +536,11 @@ export class Experiment {
     };
   }
 
-  static restore(snap: ReturnType<Experiment["snapshot"]>) {
-    const exp = new Experiment(snap.seed, snap.number);
+  static restore(snap: ReturnType<Experiment["snapshot"]>, reuse?: WorldModel) {
+    // renderers rebuild trees and props when structureVersion changes; a resync with the same fallen trees must not
+    const structure = (st: WorldModel["state"]) => `${st.objects.length}:${st.objects.reduce((n, o) => n + (o.fallen ? 1 : 0), 0)}`;
+    const prev = reuse?.state.seed === snap.seed ? { version: reuse.state.structureVersion, shape: structure(reuse.state) } : null;
+    const exp = new Experiment(snap.seed, snap.number, reuse);
     exp.genome = { personality: snap.genome.personality, innate: Float32Array.from(snap.genome.innate), fur: snap.genome.fur };
     exp.personality = snap.personality;
     if (snap.agent.state.generation > 1) {
@@ -523,13 +548,15 @@ export class Experiment {
     }
     const c = exp.ctx;
     c.rng.setState(snap.rng);
+    // copy the saved environment first: the world adopts the snapshot's objects and syncClock updates env in place
+    const ws = snap.world.state;
+    const saved = { rainAmount: ws.rainAmount, snowAmount: ws.snowAmount, fogAmount: ws.fogAmount, floodRise: ws.floodRise, weather: ws.weather, env: { ...ws.env } };
     Object.assign(c.world.state, snap.world.state);
     c.world.masting = snap.world.masting;
     if (snap.world.buried) c.world.buried.set(b64ToF32(snap.world.buried));
     c.world.syncClock();
     // syncClock re-derives the environment; keep the smoothed weather exactly as saved
-    const ws = snap.world.state;
-    Object.assign(c.world.state, { rainAmount: ws.rainAmount, snowAmount: ws.snowAmount, fogAmount: ws.fogAmount, floodRise: ws.floodRise, weather: ws.weather, env: { ...ws.env } });
+    Object.assign(c.world.state, saved);
     c.world.buildGrids();
     c.world.benches = c.world.state.objects.filter((o) => o.kind === "bench");
     c.memory.load(snap.memory);
@@ -555,9 +582,11 @@ export class Experiment {
       exp.trailCount = Math.min(TRAIL_CAP, Math.floor(tr.length / 4));
       exp.trail.set(tr.subarray(0, exp.trailCount * 4));
     }
-    // force an environment refresh on the next step
+    // force an environment refresh on the next step (a reused world keeps its meshes if its structure is unchanged)
     c.world.state.foodVersion++;
-    c.world.state.structureVersion++;
+    const now = c.world.state;
+    if (prev && structure(now) === prev.shape) now.structureVersion = prev.version;
+    else now.structureVersion = Math.max(now.structureVersion, prev?.version ?? -1) + 1;
     return exp;
   }
 }

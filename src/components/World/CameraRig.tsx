@@ -66,9 +66,10 @@ export function CameraRig({ experiment }: { experiment: Experiment }) {
     offset: 0,
   });
 
+  // re-frame on a new experiment, not on a live resync of the same one
   useEffect(() => {
     initialized.current = false;
-  }, [experiment]);
+  }, [experiment.seed, experiment.number]);
 
   useEffect(() => {
     if (!cinematic && controls.current) {

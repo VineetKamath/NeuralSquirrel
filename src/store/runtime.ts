@@ -22,8 +22,10 @@ export function createExperiment(seed: number, number: number) {
   return setExperiment(new Experiment(seed, number));
 }
 
-export function restoreExperiment(snap: ExperimentSnapshot) {
-  return setExperiment(Experiment.restore(snap));
+/** `soft`: a resync of the same experiment; the current world is regenerated in place so the 3D scene is kept */
+export function restoreExperiment(snap: ExperimentSnapshot, soft = false) {
+  const reuse = soft && current && current.seed === snap.seed && current.number === snap.number ? current.world : undefined;
+  return setExperiment(Experiment.restore(snap, reuse));
 }
 
 export function onExperimentChange(fn: (e: Experiment) => void) {

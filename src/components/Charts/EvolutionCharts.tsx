@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Area, AreaChart, Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useLab } from "@/store/labStore";
 import { PanelHeader } from "@/components/Telemetry/PanelHeader";
@@ -69,13 +69,39 @@ const MiniChart = memo(function MiniChart({ spec, data }: { spec: Spec; data: Hi
   );
 });
 
-function RadiusTip({ active, payload }: { active?: boolean; payload?: { payload: DaySummary }[] }) {
+/** a bar of the radius chart: one day, or a run of days once the experiment is too long to draw them all */
+type RadiusBar = DaySummary & { from: number };
+const MAX_BARS = 160;
+
+function radiusBars(days: DaySummary[], today: number, radiusNow: number | undefined): RadiusBar[] {
+  const all: RadiusBar[] = days.map((d) => ({ ...d, from: d.day }));
+  if (radiusNow !== undefined) all.push({ day: today, from: today, explorationRadius: radiusNow, foodEfficiency: 0, navigationEfficiency: 0, dangerAvoidance: 0, memoryAccuracy: 0, foodEaten: 0, distance: 0, restFraction: 0 });
+  if (all.length <= MAX_BARS) return all;
+  // the stored history keeps every day; only the drawing is binned (widest range, total food and distance per bin)
+  const k = Math.ceil(all.length / MAX_BARS);
+  const out: RadiusBar[] = [];
+  for (let i = 0; i < all.length; i += k) {
+    const run = all.slice(i, i + k);
+    const last = run[run.length - 1];
+    out.push({
+      ...last,
+      from: run[0].from,
+      explorationRadius: Math.max(...run.map((d) => d.explorationRadius)),
+      foodEaten: run.reduce((n, d) => n + d.foodEaten, 0),
+      distance: run.reduce((n, d) => n + d.distance, 0),
+    });
+  }
+  return out;
+}
+
+function RadiusTip({ active, payload }: { active?: boolean; payload?: { payload: RadiusBar }[] }) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
+  const span = d.from !== d.day;
   return (
     <div className="mono border border-[var(--color-line-strong)] bg-[#0a0c0d]/95 px-2 py-1 text-[9.5px]">
-      <div className="text-[var(--color-dim)]">DAY {d.day}</div>
-      <div className="tabular text-[var(--color-bright)]">{d.explorationRadius.toFixed(0)} m radius</div>
+      <div className="text-[var(--color-dim)]">{span ? `DAYS ${d.from}–${d.day}` : `DAY ${d.day}`}</div>
+      <div className="tabular text-[var(--color-bright)]">{d.explorationRadius.toFixed(0)} m {span ? "widest radius" : "radius"}</div>
       <div className="tabular text-[var(--color-mid)]">{d.foodEaten} food · {d.distance.toFixed(0)} m travelled</div>
     </div>
   );
@@ -84,21 +110,10 @@ function RadiusTip({ active, payload }: { active?: boolean; payload?: { payload:
 export function EvolutionCharts() {
   const history = useLab((s) => s.history);
   const days = useLab((s) => s.days);
-  const snap = useLab((s) => s.snap);
-  const radiusData: DaySummary[] = [...days];
-  if (snap && history.length) {
-    radiusData.push({
-      day: snap.day,
-      explorationRadius: history[history.length - 1].explorationRadius,
-      foodEfficiency: 0,
-      navigationEfficiency: 0,
-      dangerAvoidance: 0,
-      memoryAccuracy: 0,
-      foodEaten: 0,
-      distance: 0,
-      restFraction: 0,
-    });
-  }
+  // only the day number, not the whole live snapshot: this panel redraws when its data changes
+  const today = useLab((s) => s.snap?.day ?? 0);
+  const radiusNow = history.length ? history[history.length - 1].explorationRadius : undefined;
+  const radiusData = useMemo(() => radiusBars(days, today, radiusNow), [days, today, radiusNow]);
   return (
     <section className="panel flex min-h-0 flex-col">
       <PanelHeader index="06" title="BEHAVIOR EVOLUTION" meta={`${history.length} HOURLY SAMPLES · ${days.length} DAYS CLOSED`} />

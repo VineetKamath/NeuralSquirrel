@@ -169,7 +169,7 @@ export class MetricsSystem {
     const total = Math.max(1, this.totalTime);
     const avgRadius = this.radiusCount ? this.radiusSum / this.radiusCount : 0;
     const forage = (st.actionTime.SEARCH_FOR_FOOD + st.actionTime.EAT + st.actionTime.RETURN_TO_MEMORY + st.actionTime.STORE_FOOD) / total;
-    const exploration = clamp(0.3 * p.curiosityBase + 0.4 * clamp(avgRadius / 45) + 0.3 * clamp(memory.exploredFraction() * 3));
+    const exploration = clamp(0.3 * p.curiosityBase + 0.4 * clamp(avgRadius / 45) + 0.3 * clamp(memory.exploredNow() * 3));
     const risk = clamp(0.45 * p.boldness + 0.35 * clamp((this.riskTime / total) * 6) + 0.2 * clamp(st.contacts / 3));
     const foodPriority = clamp(0.25 * p.metabolism + 0.75 * clamp(forage * 2.2));
     const mem = clamp(0.4 * learning.metrics.memoryAccuracy + 0.35 * memory.averageStrength() * 2 + 0.25 * p.retention);

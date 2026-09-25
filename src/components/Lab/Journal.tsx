@@ -49,11 +49,16 @@ function Entry({ e }: { e: JournalEntry }) {
 }
 
 /** a written field notebook: one entry per simulated day, grounded in the real weather */
+/** entries rendered per page: years of daily entries would otherwise be thousands of DOM nodes */
+const PAGE = 40;
+
 export function JournalModal() {
   const open = useLab((s) => s.journalOpen);
   const journal = useLab((s) => s.journal);
   const n = useLab((s) => s.experimentNumber);
   const [q, setQ] = useState("");
+  const [shown, setShown] = useState(PAGE);
+  useEffect(() => setShown(PAGE), [q, open]);
   const list = useMemo(() => {
     const all = journal.slice().reverse();
     if (!q) return all;
@@ -84,7 +89,18 @@ export function JournalModal() {
       {list.length === 0 ? (
         <div className="mono p-10 text-center text-[10px] tracking-[0.16em] text-[var(--color-dim)]">THE FIRST ENTRY IS WRITTEN AT THE END OF DAY 1.</div>
       ) : (
-        list.map((e) => <Entry key={`${e.day}-${e.generation}`} e={e} />)
+        <>
+          {list.slice(0, shown).map((e) => (
+            <Entry key={`${e.day}-${e.generation}`} e={e} />
+          ))}
+          {list.length > shown && (
+            <div className="flex justify-center p-4">
+              <button className="btn" onClick={() => setShown((v) => v + PAGE * 2)}>
+                SHOW OLDER · {list.length - shown} MORE
+              </button>
+            </div>
+          )}
+        </>
       )}
     </Modal>
   );
