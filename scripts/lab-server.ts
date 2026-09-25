@@ -10,6 +10,8 @@
  *   LAB_SEED        seed for a brand-new experiment
  *   LAB_SAVE        path of the local save file (default data/lab-server-save.json)
  *   LAB_STATIC      directory of the exported site to serve (default out/, if it exists)
+ *   LAB_BACKUP      committed fallback save (default backup/lab-save.json.gz), used when it is newer than
+ *                   any other save, e.g. after a redeploy wiped the local save on a host without a disk
  *   HF_TOKEN + HF_SAVE_REPO   also keep the save in a Hugging Face dataset repo (survives restarts
  *                             on hosts without a persistent disk), e.g. HF_SAVE_REPO=user/squirrel-lab-save
  */
@@ -30,6 +32,7 @@ function arg(name: string, env: string, fallback: string) {
 const PORT = Number(arg("port", "PORT", "4317"));
 const SAVE = resolve(arg("save", "LAB_SAVE", "data/lab-server-save.json"));
 const STATIC = resolve(arg("static", "LAB_STATIC", "out"));
+const BACKUP = resolve(arg("backup", "LAB_BACKUP", "backup/lab-save.json.gz"));
 const HF_TOKEN = process.env.HF_TOKEN ?? "";
 const HF_REPO = process.env.HF_SAVE_REPO ?? "";
 let speed = Number(arg("speed", "LAB_SPEED", "1"));
@@ -76,10 +79,21 @@ function readLocal(): ExperimentSnapshot | null {
   }
 }
 
+function readBackup(): ExperimentSnapshot | null {
+  if (!existsSync(BACKUP)) return null;
+  try {
+    return JSON.parse(gunzipSync(readFileSync(BACKUP)).toString("utf8")) as ExperimentSnapshot;
+  } catch (e) {
+    console.warn(`[lab] could not read ${BACKUP}: ${(e as Error).message}`);
+    return null;
+  }
+}
+
 async function load(): Promise<Experiment> {
   const local = readLocal();
   const remote = await hfDownload();
-  const snap = [local, remote].filter(Boolean).sort((a, b) => b!.savedAt - a!.savedAt)[0] ?? null;
+  const backup = readBackup();
+  const snap = [local, remote, backup].filter(Boolean).sort((a, b) => b!.savedAt - a!.savedAt)[0] ?? null;
   if (snap) {
     try {
       const exp = Experiment.restore(snap);
