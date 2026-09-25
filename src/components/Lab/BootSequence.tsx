@@ -87,9 +87,6 @@ export function BootSequence({
         <Line show={step >= 2} className="text-[#6e7a76]">
           SQUIRREL LAB · WATCH A MIND GROW
         </Line>
-        <Line show={step >= 2} className="text-[10px] text-[#56615d]">
-          BUILT BY VINEET KAMATH
-        </Line>
         <div className="h-4" />
         <Line show={step >= 3}>
           THE RAMBLE · CENTRAL PARK · NEW YORK <span className="text-[#56615d]">· {SITE.centerLat.toFixed(4)}°N {Math.abs(SITE.centerLon).toFixed(4)}°W</span>
